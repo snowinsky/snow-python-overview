@@ -36,3 +36,6 @@ bar_chart.add_yaxis("销售额", y_data)
 
 # 也可以传入路径参数，如 bar_chart.render("bar_chart.html")
 bar_chart.render("./snow-python-overview/01_hello_world/files/bar_chart.html")
+
+bar_3d_chart = Bar3D()
+bar_3d_chart.add_dataset
