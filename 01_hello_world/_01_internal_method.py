@@ -162,7 +162,37 @@ print("dict =", dict([['a', 1],['b', 22.1222],['c', "abc"]]))
 
 # breakpoint(*args, **kws) 进入调试器
 # callable(object) 返回true false，判断object是否可调用
-# @classmethod 注解，加载方法上，标注该方法为静态方法
+
+
+
+# python中有三种方法，实例方法、静态方法(staticmethod) 和 类方法(classmethod)
+# 实例方法，就是一个class new出来一个实例，这个实例能点出来用的方法，实例方法第一个参数必须是self，表示new class()自身
+# 静态方法，就是虽然写在这个类里，但是和这个类没太大关系，这个方法里也不能访问这个类里的其他属性
+# 类方法，就是只有这个类被加载了，哪怕还没有实例呢，就能用类名点出来用的方法，第一个参数必须是cls 表示class自身
+
+class A13123():
+    method = 'class'
+	
+    #实例方法: 第一个参数必须是表示类实例的self
+    def normethod(self):
+        print('I am the normal method')
+
+    #静态方法：参数无所谓，其实和当前类没啥关系
+    @staticmethod
+    def stamethod():
+        print ('I am the static method')
+
+    #类方法：第一个参数必须是表示当前类的cls，想拿到类的名字，属性，方法时可以用类方法		
+    @classmethod
+    def clsmethod(cls):
+        print (f'I am the {cls.method} method')	
+
+a13123 = A13123()
+a13123.normethod()
+A13123.stamethod()
+A13123.clsmethod()
+
+# @classmethod 注解，加载方法上，标注该方法为静态方法，就是类存在方法就存在，不管有没有类的实例存在
 class ABC(object):
     a = 1
     b = 'a'
@@ -210,7 +240,34 @@ print(type(c))
 # open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
 # print(*objects, sep=' ', end='\n', file=None, flush=False)
 
-# class property(fget=None, fset=None, fdel=None, doc=None)
+# class @property(fget=None, fset=None, fdel=None, doc=None)
+# @property 装饰器，可以直接通过方法名来访问方法，不需要在方法名后添加一对“（）”小括号
+# 一个方法被注解上@property，表示它是个getter方法，不用加小括号。被注解上@方法名.setter的就是对应的setter方法
+# 类中的私有属性不能直接访问，必须用类中的函数来访问，但嫌麻烦，觉得直接用实例点出来直接改比较爽，就弄了个@property注解来间接的实现。垃圾！又当又立。呸。。。
+
+class ABCCC:
+    def printA(self):
+        print("asdfasdf")
+        return "A"
+abccc = ABCCC()
+abccc.printA()
+
+class ABCCD:
+    @property
+    def printA(self):
+        print("asdfasdf")
+        return "Getter"
+    
+    @printA.setter
+    def printA(self, sss):
+        print("asdfa", sss)
+        return "Setter"
+    
+abccd = ABCCD()
+# abccd.printA() #'str' object is not callable
+print(abccd.printA)
+abccd.printA = 'sss.value'
+print(abccd.printA)
 
 # __import__(name, globals=None, locals=None, fromlist=(), level=0)
 

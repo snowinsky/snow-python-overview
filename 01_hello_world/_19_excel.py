@@ -59,10 +59,17 @@ for row in ws1.rows:
         cellValue.append(str(cell.value))
     print(',   '.join(cellValue))
 
-
-ws2 = wb.create_sheet('Sheet2')
+sheetNameList = wb.sheetnames
+print(sheetNameList)
+if('Sheet2' in sheetNameList):
+    ws2 = wb['Sheet2']
+else:
+    ws2 = wb.create_sheet('Sheet2')
+    
 for x in range(10):
     ws2['A' + str(x+1)] = x
+    
+print(wb.chartsheets)
 
 wb.save(xlsx_path)
 #########################   openpyxl  #########################

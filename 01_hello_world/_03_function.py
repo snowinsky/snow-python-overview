@@ -40,4 +40,12 @@ if __name__ =="__main__":
     print(noFun1(3,4))
 
 
+# 最完整的函数定义方式，输入输出参数都指定了类型，棒。很容易看懂。
+def abccccc(a: int, b: float, c: str)-> bool:
+    if((str(a)+str(b)) == c):
+        return True
+    else:
+        return False
+    
+print(abccccc(1,1.1, '11.1'), abccccc(1,1.1, '11.10'))
 

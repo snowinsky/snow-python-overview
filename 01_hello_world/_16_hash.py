@@ -8,3 +8,8 @@ import hashlib
 
 for x in dir(hashlib):
     print(x)
+    
+print('aa1' in ['aa', 'bb'])
+
+aa = 2342.11
+print(type(aa))
