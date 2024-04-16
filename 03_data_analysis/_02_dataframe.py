@@ -61,5 +61,16 @@ print('********************************')
 print(df.to_json())
 print(df.to_xml())
 
+print('********************************')
 
+print(df)
+
+def applyFun1(a): #参数就是一列Series
+    print(type(a))
+    print(a)
+
+print(df.apply(applyFun1))
+
+print('********************************')
+print(df.groupby(['NAME']))
 
