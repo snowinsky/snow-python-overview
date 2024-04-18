@@ -10,7 +10,7 @@ symbol = "600519.SS"
 start_date = "2023-01-01 00:00:00"
 end_date = "2024-01-01 00:00:00"
 
-data = yf.download(symbol, start=start_date, end=end_date)
+data = yf.download(symbol, start=start_date, end=end_date) #已经连不上了，据说要用vpn才行
 # 简单的数据分析
 print(data.describe())
 

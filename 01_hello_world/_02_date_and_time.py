@@ -118,3 +118,28 @@ print(datetime.tzinfo)
 # <class 'datetime.timedelta'>
 # <class 'datetime.timezone'>
 # <class 'datetime.tzinfo'>
+
+datetimeArray = dir(datetime)
+for a in datetimeArray:
+    print(a)
+    
+    
+from datetime import datetime as dt
+from datetime import date as d
+from datetime import time as t
+from datetime import timedelta as timedelta
+from datetime import timezone as timezone
+    
+for b in dir(dt):
+    print(b)
+    
+print(dt.now(tz=None)) #返回指定时区的日期时间
+print(dt.today()) #返回今天的当前时区的日期时间
+
+print(dt.utcnow()) # 已经废弃了
+print(dt.now(datetime.UTC)) #这是新的
+
+print(dt.fromtimestamp(dt.now().timestamp(), tz=None)) #long型时间戳与datetime对象互转
+print(dt.strftime(dt.strptime('2019-11-05 09:30:50','%Y-%m-%d %H:%M:%S'), '%Y/%m/%d#%H:%M:%S')) #字符串与datetime对象互转
+
+d.today()
