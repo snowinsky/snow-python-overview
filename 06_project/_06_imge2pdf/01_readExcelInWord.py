@@ -49,6 +49,5 @@ with ZipFile(filename, "r") as zip_file:
         if not name.startswith("word/embeddings/"):
             continue
         with zip_file.open(name) as f:
-            if(f.name.endswith(".xlsx")):
+            if f.name.endswith(".xlsx"):
                 shutil.copyfile(f, filename + "_01.xlsx")
-            
