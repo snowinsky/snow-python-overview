@@ -49,7 +49,7 @@ def imageFolder2pdf(imageFolder: str):
         imageList2pdf(list(imageFolder))
         return
     imageList = [
-        os.path.join(imageFolder, fName) for fName in os.path.listdir(imageFolder)
+        os.path.join(imageFolder, fName) for fName in os.listdir(imageFolder)
     ]
     imageList2pdf(imageList)
 
@@ -57,4 +57,4 @@ def imageFolder2pdf(imageFolder: str):
 ##########################################################
 if __name__ == "__main__":
     p = os.path.join("D:\\doc_backup\\第二单元打印资料\\第二单元打印资料\\src")
-    print(os.listdir(p))
+    imageFolder2pdf(p)
