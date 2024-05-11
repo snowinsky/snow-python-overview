@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!-- 网站主语言 -->
+<html lang="zh-cn">
+{% load static %}
+<head>
+    <!-- 网站采用的字符编码 -->
+    <meta charset="utf-8">
+    <!-- 网站标题 -->
+    <title>{% block title %}登录{% endblock %}</title>
+    <!-- 引入bootstrap的css文件 -->
+    <link rel="stylesheet" href="{% static 'login/bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- 引入vuejs -->
+    <script type="text/javascript" src="{% static 'login/js/vue-2.5.16.js' %}"></script>
+    <script type="text/javascript" src="{% static 'login/js/axios-0.18.0.min.js' %}"></script>
+</head>
+
+<body>
+<div id="app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- 导航栏商标 -->
+            <a class="navbar-brand" href="{% url 'login:logon' %}">
+                <img src="{% static 'login/img/SHF.PNG' %}" alt="logo" style="width:40px;">
+            </a>
+            <div>
+                <a class="navbar-brand" href="{% url 'login:logon' %}">博客Blog</a>
+            </div>
+        </div>
+    </nav>
+
+<!--content-->
+<div class="container" style="height: 600px;margin-top: 20px">
+    {% block content %}
+        <div>This is blank content </div>
+    {% endblock %}
+</div>
+
+    
+<!-- Footer -->
+<footer class="py-3 bg-dark" id="footer">
+    <div class="container">
+        <h5 class="m-0 text-center text-white">Copyright @ shuhongfan</h5>
+    </div>
+</footer>
+
+</div>
+<!-- 引入js -->
+<script type="text/javascript" src="{% static 'login/js/host.js' %}"></script>
+<script type="text/javascript" src="{% static 'login/js/common.js' %}"></script>
+<script type="text/javascript" src="{% static 'login/js/login.js' %}"></script>
+</body>
+
+</html>
