@@ -8,11 +8,17 @@
     <!-- 网站标题 -->
     <title>{% block title %}登录{% endblock %}</title>
     <!-- 引入bootstrap的css文件 -->
-    <link rel="stylesheet" href="{% static 'login/bootstrap/css/bootstrap.min.css' %}">
-
+    <link rel="stylesheet" href="{% static 'category/bootstrap/css/bootstrap.min.css' %}">
+    <!-- 引入monikai.css -->
+    <link rel="stylesheet" href="{% static 'category/md_css/monokai.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <!--导入css-->
+    <link rel="stylesheet" href="{% static 'category/common/common.css' %}">
+    <link rel="stylesheet" href="{% static 'category/common/jquery.pagination.css' %}">
     <!-- 引入vuejs -->
-    <script type="text/javascript" src="{% static 'login/js/vue-2.5.16.js' %}"></script>
-    <script type="text/javascript" src="{% static 'login/js/axios-0.18.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'category/js/vue-2.5.16.js' %}"></script>
+    <script type="text/javascript" src="{% static 'category/js/axios-0.18.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'category/js/jquery-1.12.4.min.js' %}"></script>
 </head>
 
 <body>
@@ -21,7 +27,7 @@
         <div class="container">
             <!-- 导航栏商标 -->
             <a class="navbar-brand" href="{% url 'login:logon' %}">
-                <img src="{% static 'login/img/SHF.PNG' %}" alt="logo" style="width:40px;">
+                <img src="{% static 'category/img/SHF.PNG' %}" alt="logo" style="width:40px;">
             </a>
             <div>
                 <a class="navbar-brand" href="{% url 'login:logon' %}">博客Blog</a>
@@ -46,9 +52,9 @@
 
 </div>
 <!-- 引入js -->
-<script type="text/javascript" src="{% static 'login/js/host.js' %}"></script>
-<script type="text/javascript" src="{% static 'login/js/common.js' %}"></script>
-<script type="text/javascript" src="{% static 'login/js/login.js' %}"></script>
+<script type="text/javascript" src="{% static 'category/js/host.js' %}"></script>
+<script type="text/javascript" src="{% static 'category/js/common.js' %}"></script>
+<script type="text/javascript" src="{% static 'category/js/jquery.pagination.min.js' %}"></script>
 </body>
 
 </html>

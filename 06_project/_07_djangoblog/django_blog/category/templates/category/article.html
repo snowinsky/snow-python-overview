@@ -1,0 +1,89 @@
+{% extends 'category/layout.html' %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <!-- 文章详情 -->
+    <div class="col-9">
+      <!-- 标题及作者 -->
+      <h1 class="mt-4 mb-4">{{ article.title }}</h1>
+      <div class="alert alert-success">
+        <div>
+          作者：<span>{{ article.author.username }}</span>
+        </div>
+        <div>浏览：{{ article.total_views }}</div>
+        <!-- 删除博客 -->
+        {% if article.author.username == username %}
+          <a href="{% url 'category:article_del' %}?articleID={{ id }}" class="btn btn-primary">删除博客</a>
+        {% endif %}
+      </div>
+      <!-- 文章正文 -->
+      <div class="col-12" style="word-break: break-all;word-wrap: break-word;">
+        <p>
+          <p>{{ article.content|safe }}</p>
+        </p>
+      </div>
+      <br />
+      <!-- 发表评论 -->
+      
+      {% if username is None %}
+        <br />
+        <h5 class="row justify-content-center" v-show="!is_login">请<a href="{% url 'login:logon' %}">登录</a>后回复</h5>
+        <br />
+      {% endif %}
+      
+      <div>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="id" value="{{ article.id }}" />
+          <div class="form-group">
+            <label for="body"><strong>我也要发言：</strong></label>
+            <div>
+              <div class="django-ckeditor-widget" data-field-id="id_body" style="display: inline-block;">
+                <textarea cols="40" id="id_body" name="content" rows="5" required data-processed="0" :data-config="data_config" data-external-plugin-resources="[]" data-id="id_body" data-type="ckeditortype"></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- 提交按钮 -->
+          <button type="submit" class="btn btn-primary">发送</button>
+        </form>
+      </div>
+      <br />
+      <!-- 显示评论 -->
+      <h4>共有{{ total_count }}条评论</h4>
+      <div class="row">
+        {% for comment in comments %}
+          <div class="col-12">
+            <hr />
+            <p>
+              <strong style="color: pink"></strong>
+            </p>
+            <div>
+              <div>
+                <span><strong>{{ comment.user.username }}</strong></span>&nbsp;<span style="color: gray">{{ comment.created|date:'Y-m-d H:i' }}</span>
+              </div>
+              <br />
+              <p>{{ comment.content|safe }}</p>
+            </div>
+          </div>
+        {% endfor %}
+        <div class="pagenation" style="text-align: center">
+          <div id="pagination" class="page"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 推荐 -->
+    <div class="col-3 mt-4" id="sidebar" class="sidebar">
+      <div class="sidebar__inner">
+        <h4><strong>推荐</strong></h4>
+        <hr />
+        {% for hot_articles in hot_articles %}
+          <a href="{% url 'category:article' %}?id={{ hot_articles.id }}" style="color: black">{{ hot_articles.title }}</a><br />
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
