@@ -6,12 +6,12 @@
     <!-- 网站采用的字符编码 -->
     <meta charset="utf-8">
     <!-- 网站标题 -->
-    <title>{% block title %}登录{% endblock %}</title>
+    <title>文章详情</title>
     <!-- 引入bootstrap的css文件 -->
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <!-- 引入monikai.css -->
-    <link rel="stylesheet" href="{% static 'md_css/monokai.css' %}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <!--详情页面导入-->
+    <script src="{% static 'ckeditor/ckeditor/plugins/prism/lib/prism/prism_patched.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'prism/prism.css' %}../static/">
     <!--导入css-->
     <link rel="stylesheet" href="{% static 'common/common.css' %}">
     <link rel="stylesheet" href="{% static 'common/jquery.pagination.css' %}">
@@ -52,9 +52,26 @@
 
 </div>
 <!-- 引入js -->
+<!--ckeditor-->
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"
+        data-ckeditor-basepath="{% static 'ckeditor/ckeditor/' %}" id="ckeditor-init-script"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<!-- 引入js -->
 <script type="text/javascript" src="{% static 'js/host.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/detail.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/jquery.pagination.min.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#pagination').pagination({
+            currentPage: {{ page_num }},
+            totalPage: {{ total_page }},
+            callback:function (current) {
+                location.href = '/article/?id={{ article.id }}&page_size={{ page_size }}&page_num='+current;
+            }
+        })
+    });
+</script>
 </body>
 
 </html>
