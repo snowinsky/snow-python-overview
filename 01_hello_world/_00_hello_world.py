@@ -155,3 +155,7 @@ print(f'Binary num is {my_binary:d}, hex num is {my_hex:d}')
 print(format(687368363.1415926, ',.2f')) #逗号分隔，小数点后保留两位浮点数
 print(format('Yam Fish', '#^20')) # 补齐20位，用井号补，^表示把内容居中
 print('Binary num is {}, hex num is {}'.format('my_binary', 'my_hex')) #格式
+
+
+print('abc'.join(['111','2333','233'])) #111abc2333abc233
+
