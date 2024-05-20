@@ -2,6 +2,7 @@ from attr import attrs, attrib
 from cattr import structure,unstructure
 
 # 首先是 attrs，它主要是用来修饰 class 类的，而 attrib主要是用来做属性定义的
+# 类似于java中的lombok，可以给class自动添加一些默认的方法
 @attrs #相当于帮Color实现了init方法和repr方法：主要是 attrs 这个修饰符起了作用，然后根据定义的 attrib 属性自动帮我们实现了__init__、__repr__、__eq__、__ne__、__lt__、__le__、__gt__、__ge__、__hash__这几个方法
 class Color(object):
     r = attrib(type=int, default=0)

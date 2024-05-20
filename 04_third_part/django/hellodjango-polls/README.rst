@@ -6,4 +6,4 @@
 
 使用 python setup.py sdist命令生成一个dist文件夹，里边有个jar包
 
-python -m pip install --user hellodjango-polls/dist/django-polls-0.1.tar.gz
+python -m pip install --user hellodjango-polls/dist/django_polls-0.1.tar.gz
