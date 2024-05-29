@@ -14,25 +14,50 @@ class CephS3BOTO3():
         secret_key = 'fPNgN55AV9juwZCAKj98ApLZCF44F99c8lLEEujd'
         self.session = Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
         self.url = 'http://10.29.44.2:8080'
-        self.s3_client = self.session.client('s3', endpoint_url=self.url)
+        self.s3_client = self.session.client(service_name='s3', endpoint_url=self.url)
         self.download_base_path = "D:/data/applogs/"
 
-    def list_buckets(self):
-        buckets = [bucket['Name'] for bucket in self.s3_client.list_buckets()['Buckets']]
-        return buckets
+    def s3Client(self):
+        return self.s3_client
 
-    def create_bucket(self):
+    def list_buckets(self):
+        bucket_list = self.s3_client.list_buckets()['Buckets']
+        bucket_name_list = [bucket['Name'] for bucket in bucket_list]
+        return bucket_name_list
+
+    def create_bucket_private(self, bucket_name):
         # 默认是私有的桶
-        self.s3_client.create_bucket(Bucket='hy_test')
+        # self.s3_client.create_bucket(Bucket=bucket_name)
         # 创建公开可读的桶
         # ACL有如下几种"private","public-read","public-read-write","authenticated-read"
-        self.s3_client.create_bucket(Bucket='hy_test', ACL='public-read')
+        self.s3_client.create_bucket(Bucket=bucket_name, ACL='private')
 
-    def upload(self):
+    def create_bucket_public_read(self, bucket_name):
+        # 默认是私有的桶
+        # self.s3_client.create_bucket(Bucket=bucket_name)
+        # 创建公开可读的桶
+        # ACL有如下几种"private","public-read","public-read-write","authenticated-read"
+        self.s3_client.create_bucket(Bucket=bucket_name, ACL='public-read')
+
+    def create_bucket_public_read_write(self, bucket_name):
+        # 默认是私有的桶
+        # self.s3_client.create_bucket(Bucket=bucket_name)
+        # 创建公开可读的桶
+        # ACL有如下几种"private","public-read","public-read-write","authenticated-read"
+        self.s3_client.create_bucket(Bucket=bucket_name, ACL='public-read-write')
+
+    def create_bucket_authenticated_read(self, bucket_name):
+        # 默认是私有的桶
+        # self.s3_client.create_bucket(Bucket=bucket_name)
+        # 创建公开可读的桶
+        # ACL有如下几种"private","public-read","public-read-write","authenticated-read"
+        self.s3_client.create_bucket(Bucket=bucket_name, ACL='authenticated-read')
+
+    def upload(self, local_file_path, bucket_name, key):
         resp = self.s3_client.put_object(
-            Bucket="Aaa",  # 存储桶名称
-            Key='test',  # 上传到
-            Body=open("/Users/xx/Desktop/test.txt", 'rb').read()
+            Bucket=bucket_name,  # 存储桶名称
+            Key=key,  # 上传到
+            Body=open(local_file_path, 'rb').read()
         )
         print(resp)
         return resp
@@ -71,15 +96,11 @@ class CephS3BOTO3():
 
 
 if __name__ == "__main__":
-
-    while True:
-        times = time.time()
-        print(f'sssss={times}', end='\r\n')
-
     # boto3
     cephs3_boto3 = CephS3BOTO3()
-    # bucket_name_list = cephs3_boto3.list_buckets()
-    # print(bucket_name_list)
-    # obj_list = cephs3_boto3.list_objects_in_bucket('k8s-log')
-    # print(obj_list)
-    cephs3_boto3.download('k8s-log', 'es/20230117/cn-app-bank-vendor-2023.01.05.json')
+    bucket_name_list = cephs3_boto3.list_buckets()
+    print(bucket_name_list)
+    obj_list = cephs3_boto3.list_objects_in_bucket('k8s-log')
+    for f in obj_list:
+        print(f['file_path'])
+    # cephs3_boto3.download('k8s-log', 'es/20230117/cn-app-bank-vendor-2023.01.05.json')
