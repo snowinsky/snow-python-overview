@@ -11,6 +11,7 @@ class Boto3_S3_Client(object):
 
     具体的boto3的doc可以参考https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html
     分两种，一种是low-level的api，是.client('s3')这种，另一种是high-level的api，是.resource('s3')这种
+    client的这种是一次只搜出一千个结果，不是都搜出来
     '''
 
     def __init__(self):
@@ -27,14 +28,34 @@ class Boto3_S3_Client(object):
         return self.s3_client
 
     def list_buckets(self):
-        return [n['Name'] for n in self.s3_client.list_buckets()['Buckets']]
+        return (n['Name'] for n in self.s3_client.list_buckets()['Buckets'])
+
+    def list_objects_by_page(self, bucket_name='k8s-log', key_words=None):
+        paginator = self.s3_client.get_paginator('list_objects_v2')
+
+        with open("bank-vendor_jetpay__log.txt", 'w') as f:
+            # Create a PageIterator from the Paginator
+            page_iterator = paginator.paginate(Bucket=bucket_name, Prefix='newmetalog')
+            obj_key_list = []
+            page = 1
+            for objs in page_iterator:
+                print("批量处理中，，第", page, '页', end='\n')
+                page += 1
+                for obj in objs['Contents']:
+                    obj_key = obj['Key']
+                    if key_words:
+                        if all(key_word in obj_key for key_word in key_words):
+                            f.write(obj_key + '\n')
+                            obj_key_list.append(obj_key)
+                    else:
+                        obj_key_list.append(obj_key)
+            return obj_key_list
 
     def list_objects_in_bucket(self, bucket_name='k8s-log', key_words=None):
-        objs = self.s3_client.list_objects(Bucket=bucket_name)
+        objs = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix='newmetalog')
         obj_key_list = []
         for obj in objs['Contents']:
             obj_key = obj['Key']
-            print(obj_key)
             if key_words:
                 if all(key_word in obj_key for key_word in key_words):
                     obj_key_list.append(obj_key)
@@ -78,4 +99,6 @@ if __name__ == '__main__':
     s3client = Boto3_S3_Client()
     # obj_key_list = s3resource.list_objects_in_bucket(bucket_name='k8s-log', key_words=('newmetalog', '2023/12/31', 'cashier-wechat-api'))
     # print(obj_key_list)
-    print(s3client.list_log_file('k8s-log','2023/12/31', 'cashier-wechat-api'))
+    # print(s3client.list_log_file('k8s-log','2023/12/31', 'cashier-wechat-api'))
+    print(s3client.list_objects_by_page(bucket_name='k8s-log', key_words=('bank-vendor', 'jetpay')))
+

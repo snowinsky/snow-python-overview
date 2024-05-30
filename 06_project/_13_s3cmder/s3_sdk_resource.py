@@ -33,7 +33,7 @@ class Boto3_S3_Resource(object):
         if not bucket:
             raise FileNotFoundError(f"{bucket_name} not found in the s3")
         obj_key_list = []
-        for obj in bucket.objects.filter():
+        for obj in bucket.objects.filter("newmetalog"):
             obj_key = obj.key
             if key_words:
                 if all(key_word in obj_key for key_word in key_words):
@@ -44,7 +44,7 @@ class Boto3_S3_Resource(object):
         return obj_key_list
 
     def list_log_file(self, bucket_name='k8s-log', log_date_yyyyMMdd=None, app_name=None):
-        return self.list_objects_in_bucket(bucket_name, 'newmetalog', log_date_yyyyMMdd, app_name)
+        return self.list_objects_in_bucket(bucket_name, key_words=('newmetalog', log_date_yyyyMMdd, app_name))
 
     def object(self, bucket_name, object_key):
         return self.s3_resource.Object(bucket_name, object_key)
@@ -68,13 +68,19 @@ if __name__ == '__main__':
     # obj_key_list = s3resource.list_objects_in_bucket(bucket_name='k8s-log',
     #                                                  key_words=('newmetalog', '2023/12/31', 'cashier-wechat-api'))
     # result:['newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz']
-    print(s3resource.object('k8s-log',
-                            'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz'))
+    # print(s3resource.object('k8s-log',
+    #                         'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz'))
+    #
+    # bucket = s3resource.s3_resource.Bucket('k8s-log')
+    # obj = bucket.Object(
+    #     'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
+    # print(obj)
+    #
+    # s3resource.download('k8s-log',
+    #                     'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
 
-    bucket = s3resource.s3_resource.Bucket('k8s-log')
-    obj = bucket.Object(
-        'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
-    print(obj)
+    bucket = s3resource.s3Resource().Bucket("k8s-log")
 
-    s3resource.download('k8s-log',
-                        'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
+    i = 0
+    obj_name_list = [obj.key for obj in bucket.objects.filter(Prefix="newmetalog")]
+    print(obj_name_list)
