@@ -33,7 +33,7 @@ class Boto3_S3_Resource(object):
         if not bucket:
             raise FileNotFoundError(f"{bucket_name} not found in the s3")
         obj_key_list = []
-        for obj in bucket.objects.filter("newmetalog"):
+        for obj in bucket.objects.filter(Prefix="newmetalog"):
             obj_key = obj.key
             if key_words:
                 if all(key_word in obj_key for key_word in key_words):
@@ -63,24 +63,27 @@ class Boto3_S3_Resource(object):
 
 
 if __name__ == '__main__':
-    # print(all(k in 'metalog/2022/03/17/whdck8s004.cn.prod.log' for k in ('metalog', '2022/03/17')))
+    # print("请输入要下载的日志的日期格式yyyy-MM-dd：")
+    # log_date_str = input()
+    # print("请输入要下载日志的服务名，就是rancher上的node的前半段名字：")
+    # app_name = input()
+    #
+    # print(f"你是想要下载{app_name}在{log_date_str}这一天的日志，是吗？【y/n】")
+    # yes_no = input()
+    # if yes_no != 'y':
+    #     exit()
+    #
+    # print("开始查找日志，因为日志超级多，查找速度会有点慢。。。。等。。。。耐着性子等。。。。。")
+    # s3resource = Boto3_S3_Resource()
+    # l = s3resource.list_log_file(bucket_name='k8s-log', log_date_yyyyMMdd=log_date_str, app_name=app_name)
+    # print("多谢等待，终于有结果了", l)
+    # if not l:
+    #     raise FileNotFoundError("没找到log日志文件，联系运维组帮忙看一下吧")
+    #
+    # for f in l:
+    #     s3resource.download('k8s-log', f)
+
+    print("请输入要下载的日志的key：")
+    log_file_key = input()
     s3resource = Boto3_S3_Resource()
-    # obj_key_list = s3resource.list_objects_in_bucket(bucket_name='k8s-log',
-    #                                                  key_words=('newmetalog', '2023/12/31', 'cashier-wechat-api'))
-    # result:['newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz']
-    # print(s3resource.object('k8s-log',
-    #                         'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz'))
-    #
-    # bucket = s3resource.s3_resource.Bucket('k8s-log')
-    # obj = bucket.Object(
-    #     'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
-    # print(obj)
-    #
-    # s3resource.download('k8s-log',
-    #                     'newmetalog/2023/12/31/whdck8s059.cn.prod/data/logs/dddt/cashier-wechat-api/cashier-wechat-api--deployment--a-5dd486b647-2hgp5/logs/applicationlog/cashier-wechat-api.2023-12-29.log.tar.gz')
-
-    bucket = s3resource.s3Resource().Bucket("k8s-log")
-
-    i = 0
-    obj_name_list = [obj.key for obj in bucket.objects.filter(Prefix="newmetalog")]
-    print(obj_name_list)
+    s3resource.download('k8s-log', log_file_key)
