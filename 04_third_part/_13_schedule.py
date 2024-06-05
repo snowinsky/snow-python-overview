@@ -25,4 +25,5 @@ def func():
         schedule.run_pending()
 
 
-func()
+if __name__ == '__main__':
+    func()
