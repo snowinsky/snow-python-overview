@@ -51,5 +51,9 @@ def xpath_etree(xml_str):
     print(root.findall('./Cmp'))
     print(root.findall('./Cmp/BatchFileName')[0].text)
 
+    cmp = root.findall('./Cmp')[0]
+    for it in cmp.iter():
+        print(it.tag, it.text)
+
 if __name__ == '__main__':
     xpath_etree(xml_string)

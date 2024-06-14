@@ -159,3 +159,11 @@ print('Binary num is {}, hex num is {}'.format('my_binary', 'my_hex')) #格式
 
 print('abc'.join(['111','2333','233'])) #111abc2333abc233
 
+
+###  字符串模板的三种使用方式，1 百分号玩法 2 str的format函数 3 f字符串  第一种不推荐，第二种适合模板和赋值分离的情况，第三种适合模板和赋值不分离的情况
+txt1 = "My name is {fname}, I'm {age}".format(fname = "John", age = 36)
+txt2 = "My name is {0}, I'm {1}".format("John",36)
+txt3 = "My name is {}, I'm {}".format("John",36)
+
+print(txt1, txt2, txt3)
+
