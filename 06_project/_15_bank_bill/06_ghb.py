@@ -26,6 +26,7 @@ def get_bill(start_date, end_date, bank_acct):
     print(res.text)
 
 
+## 连不上
 if __name__ == '__main__':
     for ba in bank_acct_list:
         get_bill('20240511', '20240511', ba)

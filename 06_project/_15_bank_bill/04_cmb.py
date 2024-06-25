@@ -206,6 +206,7 @@ def get_bill(start_date, end_date, bank_acct, bank_no):
     res_ret_detail_list = res_xml.findall('./NTQTSINFZ')
     print(res_ret_code, len(res_ret_detail_list))
 
+# cmd 没有数据吗
 if __name__ == '__main__':
     acct_and_no = [(a.expandtabs(2)[8:22], a.expandtabs(2)[24:26]) for a in cmb_bank_acct.split('\n')]
     for a_n in acct_and_no:

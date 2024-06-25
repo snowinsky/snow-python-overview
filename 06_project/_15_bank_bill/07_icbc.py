@@ -76,6 +76,7 @@ def get_bill(start_date, end_date, bank_acct):
     print(rsa_public_key.verify_str_sign(str(res_data['response_biz_content']), res_data['sign']))
 
 
+## 需要验签，总是不对
 if __name__ == '__main__':
     for ba in bank_acct_list:
         get_bill('20240511', '20240511', ba)
