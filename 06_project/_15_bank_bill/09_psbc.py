@@ -178,7 +178,7 @@ from socket import *  # 导入 socket 模块
 import datetime
 import xml.etree.ElementTree as ET
 
-ADDR = ('10.25.2.21', 9000)
+ADDR = ('10.25.2.21', 9331)
 # ADDR = ('192.168.249.76', 10047)
 psbc_outcode = '1216004'
 psbc_merch_id = '120020160004'
@@ -213,7 +213,7 @@ def get_bill(start_date, end_date, credit_bank_account):
         req_data = (str(len(req_xml))).rjust(5, '0')+'00000' + req_xml
         print(req_data)
         tcpCliSock.send(req_data.encode(CHARSET))
-        res_data_length = tcpCliSock.recv(10)
+        res_data_length = tcpCliSock.recv(6)
         if res_data_length:
             res_data = tcpCliSock.recv(int(res_data_length))
             print('response=', res_data.decode(CHARSET))
@@ -228,4 +228,8 @@ def get_bill(start_date, end_date, credit_bank_account):
         tcpCliSock.close()
 # 能ping通，但是连接不上，报timeout
 if __name__ == '__main__':
-    get_bill('20240511','20240511', '912008010000022176')
+    bank_acct_list = list(filter(lambda a:len(a) > 1, psbc_bank_acct.split('\n')))
+    get_bill('20240628','20240628', '912006010000021402')
+    # for ba in bank_acct_list:
+    #     print(ba)
+    #     get_bill('20240511','20240511', ba)

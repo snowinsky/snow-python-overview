@@ -38,45 +38,100 @@ ccb_ebs_password = '21515960'
 ADDR = (ccb_ebs_ip, ccb_ebs_port)
 CHARSET = 'GB18030'
 
+req_xml_old_template = '''
+<?xml version="1.0" encoding="GB18030" standalone="yes"?>
+<TX>
+    <REQUEST_SN>1</REQUEST_SN>
+    <CUST_ID>P636067462#0H</CUST_ID>
+    <USER_ID>WLPT13</USER_ID>
+    <PASSWORD>21515960</PASSWORD>
+    <TX_CODE>6W0300</TX_CODE>
+    <LANGUAGE>CN</LANGUAGE>
+    <TX_INFO>
+        <ACC_NO>12050183510000000647-0019</ACC_NO>
+        <START_DATE>20240626</START_DATE>
+        <END_DATE>20240626</END_DATE>
+        <START_PAGE>1</START_PAGE>
+    </TX_INFO>
+</TX>
+'''
+
+req_xml_new_template = '''
+<?xml version="1.0" encoding="GB18030" standalone="yes"?>
+<TX>
+    <REQUEST_SN>1</REQUEST_SN>
+    <CUST_ID>P636067462#0H</CUST_ID>
+    <USER_ID>WLPT13</USER_ID>
+    <PASSWORD>21515960</PASSWORD>
+    <TX_CODE>6WY101</TX_CODE>
+    <LANGUAGE>CN</LANGUAGE>
+    <TX_INFO>
+        <ACCNO1>12050183510000000647-0019</ACCNO1>
+        <STARTDATE>20240626</STARTDATE>
+        <ENDDATE>20240626</ENDDATE>
+        <PAGE>1</PAGE>
+    </TX_INFO>
+</TX>
+'''
+
+# req_xml = f'''
+#             <?xml version="1.0" encoding="GB18030" standalone="yes"?>
+#             <TX>
+#                 <REQUEST_SN>
+#                     1
+#                 </REQUEST_SN>
+#                 <CUST_ID>
+#                     {ccb_ebs_customer}
+#                 </CUST_ID>
+#                 <USER_ID>
+#                     {ccb_ebs_user}
+#                 </USER_ID>
+#                 <PASSWORD>
+#                     {ccb_ebs_password}
+#                 </PASSWORD>
+#                 <TX_CODE>
+#                     6W0300
+#                 </TX_CODE>
+#                 <LANGUAGE>
+#                     CN
+#                 </LANGUAGE>
+#                 <TX_INFO>
+#                     <ACC_NO>
+#                         {credit_acct}
+#                     </ACC_NO>
+#                     <START_DATE>
+#                         {start_date}
+#                     </START_DATE>
+#                     <END_DATE>
+#                         {end_date}
+#                     </END_DATE>
+#                     <START_PAGE>
+#                         1
+#                     </START_PAGE>
+#                 </TX_INFO>
+#             </TX>
+#     '''
+
 
 def get_bill(start_date, end_date, credit_acct):
     req_xml = f'''
-            <?xml version="1.0" encoding="GB18030" standalone="yes"?>
-            <TX>
-                <REQUEST_SN>
-                    1
-                </REQUEST_SN>
-                <CUST_ID>
-                    {ccb_ebs_customer}
-                </CUST_ID>
-                <USER_ID>
-                    {ccb_ebs_user}
-                </USER_ID>
-                <PASSWORD>
-                    {ccb_ebs_password}
-                </PASSWORD>
-                <TX_CODE>
-                    6W0300
-                </TX_CODE>
-                <LANGUAGE>
-                    CN
-                </LANGUAGE>
-                <TX_INFO>
-                    <ACC_NO>
-                        {credit_acct}
-                    </ACC_NO>
-                    <START_DATE>
-                        {start_date}
-                    </START_DATE>
-                    <END_DATE>
-                        {end_date}
-                    </END_DATE>
-                    <START_PAGE>
-                        1
-                    </START_PAGE>
-                </TX_INFO>
-            </TX>
+    <?xml version="1.0" encoding="GB18030" standalone="yes"?>
+    <TX>
+        <REQUEST_SN>1</REQUEST_SN>
+        <CUST_ID>{ccb_ebs_customer}</CUST_ID>
+        <USER_ID>{ccb_ebs_user}</USER_ID>
+        <PASSWORD>{ccb_ebs_password}</PASSWORD>
+        <TX_CODE>6WY101</TX_CODE>
+        <LANGUAGE>CN</LANGUAGE>
+        <TX_INFO>
+            <ACCNO1>{credit_acct}</ACCNO1>
+            <STARTDATE>{start_date}</STARTDATE>
+            <ENDDATE>{end_date}</ENDDATE>
+            <PAGE>1</PAGE>
+        </TX_INFO>
+    </TX>
     '''
+
     req_data = ''.join([a.strip() for a in req_xml.split('\n')])
     print('request=', req_data)
     with socket(AF_INET, SOCK_STREAM) as tcpCliSock:

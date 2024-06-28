@@ -173,3 +173,4 @@ res_xml = '''
 if __name__ == '__main__':
     for ba in banc_acct_list:
         get_bill('2024-05-11', '2024-05-11', ba)
+        break

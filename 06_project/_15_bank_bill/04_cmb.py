@@ -210,5 +210,5 @@ def get_bill(start_date, end_date, bank_acct, bank_no):
 if __name__ == '__main__':
     acct_and_no = [(a.expandtabs(2)[8:22], a.expandtabs(2)[24:26]) for a in cmb_bank_acct.split('\n')]
     for a_n in acct_and_no:
-        get_bill('20240501', '20240601', a_n[0], a_n[1])
+        get_bill('20240511', '20240511', a_n[0], a_n[1])
     # get_bill('20240511', '20240511', '122903873910545', '22')
