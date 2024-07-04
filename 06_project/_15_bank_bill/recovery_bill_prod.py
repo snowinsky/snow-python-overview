@@ -220,6 +220,31 @@ elif platform.system() == "Windows":
     d = r"D:/download/instantclient-basic-windows.x64-19.23.0.0.0dbru/instantclient_19_23"
 oracledb.init_oracle_client(lib_dir=d)
 
+
+def get_bill_load_error_records(start_date, end_date):
+    with oracledb.connect(user=user, password=pawd, dsn=db_url) as connection:
+        with connection.cursor() as cursor:
+            sql_get_error_trade_status = '''
+            SELECT
+                b.id,
+                b.TRADE_TIME AS trade_date,
+                b.TRADE_STATUS ,
+                b.HCC_ACCOUNT AS bank_acct,
+                b.CREATOR AS bank_code
+            FROM
+                T_RECON_S_DETAIL_B b
+            WHERE
+                b.TRADE_STATUS = 'E'
+                AND b.TRADE_TIME >= to_date(:start_date, 'yyyymmdd')
+                AND b.TRADE_TIME < to_date(:end_date, 'yyyymmdd')
+            '''
+            sql_parameter_map = {'start_date': start_date, 'end_date': end_date}
+            l = []
+            print(sql_get_error_trade_status, sql_parameter_map)
+            for r in cursor.execute(statement=sql_get_error_trade_status, parameters=sql_parameter_map):
+                l.append(r)
+            return l
+
 def check_bill_load_status(start_date, end_date):
     with oracledb.connect(user=user, password=pawd, dsn=db_url) as connection:
         with connection.cursor() as cursor:
@@ -248,8 +273,14 @@ def check_bill_load_status(start_date, end_date):
 def re_load_bill(recon_date, bank_code):
     print(f're-load the bill for {bank_code} on {recon_date} in process......')
     res = requests.get(url=f"https://reconcile-bank-web.prod.hccn/load/{bank_code}/{recon_date}", verify=False)
+    # res = requests.get(url=f"http://localhost:8080/load/{bank_code}/{recon_date}", verify=False)
     print(res.text)
 
+def re_load_bill_by_bankacct(recon_date, bank_code, bank_acct):
+    print(f're-load the bill for {bank_code}.{bank_acct} on {recon_date} in process......')
+    # res = requests.get(url=f"https://reconcile-bank-web.prod.hccn/load/{bank_code}/{recon_date}", verify=False)
+    res = requests.get(url=f"http://localhost:8080/load/{bank_code}/{recon_date}/{bank_acct}", verify=False)
+    print(res.text)
 def recover_lack_bank_on_date():
     l = check_bill_load_status('20230101', '20240101')
     print(l)
@@ -265,8 +296,8 @@ def recover_lack_bank_on_date():
         # break
 
 def recover_lack_bank_on_date_range(bank_code):
-    start_date = datetime.datetime(2024, 5, 1)
-    end_date = datetime.datetime(2024, 6, 1)
+    start_date = datetime.datetime(2023, 12, 31)
+    end_date = datetime.datetime(2024, 1, 1)
 
     time_delta = end_date - start_date
 
@@ -281,6 +312,8 @@ if __name__ == '__main__':
     # print(all_bank_set.difference(cur_set))
 
     # main()
+    
+    # check_bill_load_status('20240101', '20240101')
 
     recover_lack_bank_on_date_range('PSBC')
 

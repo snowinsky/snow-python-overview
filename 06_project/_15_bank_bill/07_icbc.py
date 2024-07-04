@@ -19,7 +19,7 @@ bank_acct_list = (
 import datetime
 import json
 import requests
-from rsa_crypt.rsa_crypt import RSAPubCrypt, RSAPrvCrypt
+from rsa_crypt.rsa_crypt import RSAPubCrypt, RSAPrvCrypt, RSACrypt
 import urllib.parse
 
 
@@ -67,17 +67,22 @@ def get_bill(start_date, end_date, bank_acct):
     }
     res = requests.post(icbc_request_url + '?' + urllib.parse.urlencode(req_dic), headers=header)
     res_json = res.text
-
+    print("res_text=", res_json)
     res_data = json.loads(res_json)
-    res_biz_content = res_data['response_biz_content']
+    res_biz_content = res_json[24:res_json.index(',"sign":"')]
+    print('res_biz_content_text=', res_biz_content)
     res_sign = res_data['sign']
-    print(res_biz_content, res_sign)
+    print('res_sign_text=', res_sign)
     rsa_public_key = RSAPubCrypt(b64decode(icbc_public_key))
-    print(rsa_public_key.verify_str_sign(str(res_data['response_biz_content']), res_data['sign']))
+    print(rsa_public_key)
+    print(rsa_public_key.verify_str_sign(res_biz_content, res_sign))
+
 
 
 ## 需要验签，总是不对
 if __name__ == '__main__':
     for ba in bank_acct_list:
-        get_bill('20240511', '20240511', ba)
-        break
+        if(ba == '0302035119300379662'):
+            get_bill('20240511', '20240511', ba)
+            break
+        # break
