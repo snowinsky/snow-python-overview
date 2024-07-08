@@ -296,8 +296,8 @@ def recover_lack_bank_on_date():
         # break
 
 def recover_lack_bank_on_date_range(bank_code):
-    start_date = datetime.datetime(2023, 12, 31)
-    end_date = datetime.datetime(2024, 1, 1)
+    start_date = datetime.datetime(2024, 7, 6)
+    end_date = datetime.datetime(2024, 7, 8)
 
     time_delta = end_date - start_date
 
