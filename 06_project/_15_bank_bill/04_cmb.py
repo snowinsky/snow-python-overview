@@ -195,20 +195,55 @@ cmb_op_name = 'N034346696'
 
 
 def get_bill(start_date, end_date, bank_acct, bank_no):
-    req_data = f'{req_xml}'
+    req_data = f'''
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <CMBSDKPGK>
+                <INFO>
+                    <FUNNAM>
+                        GetTransInfo
+                    </FUNNAM>
+                    <DATTYP>
+                        2
+                    </DATTYP>
+                    <LGNNAM>
+                        {cmb_op_name}
+                    </LGNNAM>
+                </INFO>
+                <SDKTSINFX>
+                    <BBKNBR>
+                        {bank_no}
+                    </BBKNBR>
+                    <ACCNBR>
+                        {bank_acct}
+                    </ACCNBR>
+                    <BGNDAT>
+                        {start_date}
+                    </BGNDAT>
+                    <ENDDAT>
+                        {end_date}
+                    </ENDDAT>
+                </SDKTSINFX>
+            </CMBSDKPGK>
+    '''
     req_data = ''.join([a.strip() for a in req_data.split('\n')])
-    # print('request=', req_data)
+    print('request=', req_data)
     res = requests.post(cmb_url, data=req_data)
     print("#########################\n\n\n")
-    print(res.text)
+    print('response=', res.text)
     res_xml = ET.fromstring(res.text)
     res_ret_code = res_xml.findall('./INFO/RETCOD')[0].text
     res_ret_detail_list = res_xml.findall('./NTQTSINFZ')
-    print(res_ret_code, len(res_ret_detail_list))
+    print(f'return_code={res_ret_code}, return_detail_list_size={len(res_ret_detail_list)}')
+
+def get_bill_by_acct_list():
+    acct_and_no = [(a.expandtabs(2)[8:22], a.expandtabs(2)[24:26]) for a in cmb_bank_acct.split('\n')]
+    for a_n in acct_and_no:
+        if (len(a_n[0]) == 0):
+            continue
+        bank_acct = a_n[0]
+        bank_no = a_n[1]
+        get_bill('20240714', '20240714', bank_acct, bank_no)
 
 # cmd 没有数据吗
 if __name__ == '__main__':
-    acct_and_no = [(a.expandtabs(2)[8:22], a.expandtabs(2)[24:26]) for a in cmb_bank_acct.split('\n')]
-    for a_n in acct_and_no:
-        get_bill('20240511', '20240511', a_n[0], a_n[1])
-    # get_bill('20240511', '20240511', '122903873910545', '22')
+    get_bill('20240714', '20240714', '122903873910842', '22')
