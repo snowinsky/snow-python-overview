@@ -57,5 +57,5 @@ def recovery_bill(start_date, end_date):
 
 
 if __name__ == '__main__':
-    recovery_bill('20240704', '20240707')
+    recovery_bill('20240714', '20240716')
     

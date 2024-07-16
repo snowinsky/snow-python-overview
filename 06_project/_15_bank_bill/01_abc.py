@@ -23,9 +23,9 @@ slaver = {
     'opNo' : "0020"
 }
 
-HOST = master['host']  # or 'localhost'
-PORT = master['port']
-abcFileServiceUrl = master['url']
+HOST = slaver['host']  # or 'localhost'
+PORT = slaver['port']
+abcFileServiceUrl = slaver['url']
 
 
 
@@ -111,7 +111,7 @@ def get_bill_name_abc_socket_client(startDate, endDate, creditBankAccount):
         res_data_length = tcpCliSock.recv(7)
         if res_data_length:
             res_data = tcpCliSock.recv(int(res_data_length))
-            print('response=', res_data.decode(CHARSET))
+            # print('response=', res_data.decode(CHARSET))
             xml_root = ET.fromstring(res_data.decode(CHARSET))
             respCode = xml_root.find('RespCode').text
             respSeqNo = xml_root.find('RespSeqNo').text
@@ -128,11 +128,22 @@ def get_bill_content(bill_file_name):
     res.encoding = CHARSET
     return res.text
 
-
-if __name__ == '__main__':
+def get_all_bill_for_all_accts(recon_date):
     for credit_bank_acct in creditBankAccounts:
-        seqNo, rescode, fileflag, filename = get_bill_name_abc_socket_client('20240511', '20240511', credit_bank_acct)
+        seqNo, rescode, fileflag, filename = get_bill_name_abc_socket_client(recon_date, recon_date, credit_bank_acct)
         print(seqNo, rescode, fileflag, filename)
         if rescode == '0000' and fileflag == '1':
             print("############", filename, "##########")
-            print(get_bill_content(filename))
+            print("file content====", get_bill_content(filename))
+
+def get_bill_for_acct(recon_date, bank_acct):
+    seqNo, rescode, fileflag, filename = get_bill_name_abc_socket_client(recon_date, recon_date, bank_acct)
+    print(seqNo, rescode, fileflag, filename)
+    if rescode == '0000' and fileflag == '1':
+        print("############", filename, "##########")
+        print("file content====", get_bill_content(filename))
+
+if __name__ == '__main__':
+    get_all_bill_for_all_accts('20240715')
+    # get_bill_for_acct('20240715', '190001040020693')
+

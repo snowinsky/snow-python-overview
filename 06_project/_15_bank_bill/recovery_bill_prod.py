@@ -282,7 +282,7 @@ def re_load_bill_by_bankacct(recon_date, bank_code, bank_acct):
     res = requests.get(url=f"http://localhost:8080/load/{bank_code}/{recon_date}/{bank_acct}", verify=False)
     print(res.text)
 def recover_lack_bank_on_date():
-    l = check_bill_load_status('20230101', '20240101')
+    l = check_bill_load_status('20240715', '20240716')
     print(l)
     for one_day in l:
         recon_date_str = datetime.datetime.strftime(one_day[0], '%Y%m%d')
@@ -296,8 +296,8 @@ def recover_lack_bank_on_date():
         # break
 
 def recover_lack_bank_on_date_range(bank_code):
-    start_date = datetime.datetime(2024, 7, 8)
-    end_date = datetime.datetime(2024, 7, 9)
+    start_date = datetime.datetime(2024, 7, 15)
+    end_date = datetime.datetime(2024, 7, 16)
 
     time_delta = end_date - start_date
 
@@ -315,6 +315,8 @@ if __name__ == '__main__':
     
     # check_bill_load_status('20240101', '20240101')
 
-    recover_lack_bank_on_date_range('PSBC')
+    recover_lack_bank_on_date_range('ABC')
+
+    #recover_lack_bank_on_date()
 
     #re_load_bill('20240628', 'PSBC')
