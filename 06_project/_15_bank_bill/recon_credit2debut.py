@@ -346,7 +346,9 @@ sql_oracle_recon_template = '''
 
 sql_pg_recon_template = '''
         select
-            case l.channel_group when 'WECHAT' then 'CAPP-WECHAT'
+            case l.channel_group 
+            when 'WECHAT' then 'CAPP-WECHAT'
+            when 'Alipay' then 'ALIPAY'
             else l.channel_group end as vendor_group,
             '12050183510000001896' as deduct_to_acct,
             sum(l.amount::integer) as deduct_to_amt_sum
@@ -469,6 +471,7 @@ def reconcile_local2bank_client_dd_vendor(recon_date):
         print("client_dd unmatch  bank:", c, t1_recon_date_str)
     return list(sorted(matched)), list(sorted(unmatch_local)), list(sorted(unmatch_bank))
 
+
 def write_recon_local2bank_report(recon_date):
     with open(f"D:/data/channel-proxy/recon/bank/recon_local2bank_{recon_date}.txt", 'w', encoding='utf-8') as f:
         f.write("#########################################################################################\n")
@@ -520,8 +523,124 @@ def write_recon_local2bank_report(recon_date):
             f.write(f"cd-unmatched bank:{recon_date} + 1,{c}\n")
         f.write(f"---unmatched bank on {recon_date} + 1---------------------------------------------------------\n\n")
 
+
+def recon_3days():
+    '''
+    对账，只能对t-2的账，因为t-1拿银行收款对账单，然后对t-2的账
+    :return:
+    '''
+    today = dt.datetime.today()
+    t_1 = today - dt.timedelta(days=1)
+    t_2 = today - dt.timedelta(days=2)
+    t_3 = today - dt.timedelta(days=3)
+    t_4 = today - dt.timedelta(days=4)
+    write_recon_local2bank_report(t_2.strftime('%Y%m%d'))
+    write_recon_local2bank_report(t_3.strftime('%Y%m%d'))
+    write_recon_local2bank_report(t_4.strftime('%Y%m%d'))
+
+
+def save_recon_local2bank(recon_date):
+    local_trade_sum_list = set(get_local_direct_linkage_vendor_sum(recon_date))
+    for local in local_trade_sum_list:
+        save_local_credit(recon_date, local)
+    bank_credit_sum_list = set(get_bank_direct_linkage_vendor_sum(recon_date))
+    for bank in bank_credit_sum_list:
+        save_bank_debit(recon_date, bank)
+
+
+from db_access import mysql_local
+
+
+def save_local_credit(recon_date, record_tuple):
+    select_sql = "select * from t_local_credit_bank_debit t where t.credit_date = %(dt)s and t.credit_channel = %(channel)s and t.credit_acct = %(acct)s"
+    select_sql_param = {'dt': int(recon_date), 'channel': record_tuple[0], 'acct': record_tuple[1]}
+    select_sql_result = mysql_local.execute_query_sql(select_sql, select_sql_param)
+    if select_sql_result == None or len(select_sql_result) == 0:
+        insert_sql = 'insert t_local_credit_bank_debit(credit_date, credit_channel, credit_acct, credit_amt, recon_balance) values(%s, %s, %s, %s, %s)'
+        insert_sql_param = (int(recon_date), record_tuple[0], record_tuple[1], record_tuple[2], record_tuple[2])
+        cnt, last_id = mysql_local.execute_insert_sql(insert_sql, insert_sql_param)
+        mysql_local.execute_update_sql('update t_local_credit_bank_debit set debit_credit_id = id where id = %s', (last_id))
+        return
+    update_sql = "update t_local_credit_bank_debit set credit_amt = %s, recon_balance = %s where id = %s"
+    update_sql_param = (record_tuple[2], record_tuple[2], select_sql_result[0][0])
+    mysql_local.execute_update_sql(update_sql, update_sql_param)
+
+
+def save_bank_debit(recon_date, record_tuple):
+    select_sql = "select * from t_local_credit_bank_debit t where t.debit_date = %(dt)s and t.debit_channel = %(channel)s and t.debit_acct = %(acct)s"
+    select_sql_param = {'dt': int(recon_date), 'channel': record_tuple[0], 'acct': record_tuple[1]}
+    select_sql_result = mysql_local.execute_query_sql(select_sql, select_sql_param)
+    if select_sql_result == None or len(select_sql_result) == 0:
+        # get balance > 0 credit items
+        select_sql = '''
+            SELECT 
+                t.id, 
+                t.credit_date, 
+                t.credit_channel,
+                t.credit_acct, 
+                t.credit_amt, 
+                t.recon_balance
+            FROM app_recon.t_local_credit_bank_debit t
+            WHERE 
+             t.credit_channel = %(channel)s AND t.credit_acct = %(acct)s AND t.recon_balance > 0
+            ORDER BY t.credit_date ASC
+        '''
+        select_sql_param = {'channel': record_tuple[0], 'acct': record_tuple[1]}
+        no_match_local_list = mysql_local.execute_query_sql(select_sql, select_sql_param)
+        for no_match_local in no_match_local_list:
+            debit_amt = record_tuple[2]
+            local_balance = no_match_local[5]
+            if debit_amt > local_balance:
+                # match the full balance then insert new record
+                insert_credit = '''
+                    insert into t_local_credit_bank_debit( debit_credit_id,
+                        debit_date, debit_channel, debit_acct, debit_amt, debit_amt_balance
+                    )
+                    values(%s,%s,%s,%s,%s,%s)
+                '''
+                insert_credit_param = (no_match_local[0],
+                int(recon_date), record_tuple[0], record_tuple[1], record_tuple[2], local_balance)
+                mysql_local.execute_insert_sql(insert_credit, insert_credit_param)
+                insert_credit_param = (
+                int(recon_date), record_tuple[0], record_tuple[1], record_tuple[2], debit_amt - local_balance)
+                mysql_local.execute_insert_sql(insert_credit, insert_credit_param)
+
+                update_recon_balance_sql = '''
+                                            UPDATE t_local_credit_bank_debit 
+                                            SET recon_balance = %s
+                                            WHERE id = %s
+                                            '''
+                update_recon_balance_sql_param = (0, no_match_local[0])
+                mysql_local.execute_update_sql(update_recon_balance_sql, update_recon_balance_sql_param)
+            else:
+                # match partial balance
+                insert_credit = '''
+                                    insert into t_local_credit_bank_debit(debit_credit_id,
+                                        debit_date, debit_channel, debit_acct, debit_amt, debit_amt_balance
+                                    )
+                                    values(%s,%s,%s,%s,%s,%s)
+                                '''
+                insert_credit_param = (no_match_local[0],
+                int(recon_date), record_tuple[0], record_tuple[1], record_tuple[2], record_tuple[2])
+                mysql_local.execute_insert_sql(insert_credit, insert_credit_param)
+
+                update_recon_balance_sql = '''
+                                            UPDATE t_local_credit_bank_debit 
+                                            SET recon_balance = %s
+                                            WHERE id = %s
+                                            '''
+                update_recon_balance_sql_param = (local_balance - debit_amt, no_match_local[0])
+                mysql_local.execute_update_sql(update_recon_balance_sql, update_recon_balance_sql_param)
+
+        # not found credit item, insert only
+        insert_sql = 'insert t_local_credit_bank_debit(debit_date, debit_channel, debit_acct, debit_amt) values(%s, %s, %s, %s)'
+        insert_sql_param = (int(recon_date), record_tuple[0], record_tuple[1], record_tuple[2])
+        mysql_local.execute_insert_sql(insert_sql, insert_sql_param)
+        return
+
+
 if __name__ == '__main__':
-    write_recon_local2bank_report('20240713')
+    # recon_3days()
     # for a in get_local_client_dd_vendor_sum('20240713'):
     #     print(a)
     # for lts in local_trade_sum_list:
@@ -536,3 +655,4 @@ if __name__ == '__main__':
     #
     # for b in bank_credit_sum_list:
     #     print(f'unmatched bank={b}')
+    write_recon_local2bank_report('20240714')
